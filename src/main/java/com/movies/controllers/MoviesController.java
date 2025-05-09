@@ -152,4 +152,13 @@ public class MoviesController {
         moviesService.deleteById(movieId.intValue());
         return ResponseEntity.ok("Deleted movie id - " + movieId);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<MovieResponseDTO>> searchMoviesByName(@RequestParam String name) {
+        List<Movie> movies = moviesService.findByNameContaining(name, Pageable.unpaged()).getContent();
+        List<MovieResponseDTO> response = movies.stream()
+                .map(MovieMapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
 }
