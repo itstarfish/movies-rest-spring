@@ -9,6 +9,13 @@ import java.time.LocalDateTime;
 
 public class MovieCategoryMapper {
 
+    /**
+     * Converts a MovieCategoryCreateDTO to a MovieCategory entity.
+     *
+     * @param dto       the DTO containing the creation details of the movie category
+     * @param createdBy the user who created the movie category
+     * @return a new MovieCategory entity
+     */
     public static MovieCategory toEntity(MovieCategoryCreateDTO dto, User createdBy) {
         MovieCategory category = new MovieCategory();
         category.setName(dto.getName());
@@ -16,6 +23,12 @@ public class MovieCategoryMapper {
         return category;
     }
 
+    /**
+     * Converts a MovieCategory entity to a MovieCategoryResponseDTO.
+     *
+     * @param entity the MovieCategory entity to convert
+     * @return the corresponding MovieCategoryResponseDTO
+     */
     public static MovieCategoryResponseDTO toResponse(MovieCategory entity) {
         MovieCategoryResponseDTO dto = new MovieCategoryResponseDTO();
         dto.setId(entity.getId());

@@ -1,7 +1,6 @@
 package com.movies.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.movies.config.PaginationProperties;
 import com.movies.dao.MoviesRepository;
 import com.movies.dto.MovieCreateDTO;
@@ -9,7 +8,7 @@ import com.movies.dto.MovieResponseDTO;
 import com.movies.entity.Movie;
 import com.movies.entity.User;
 import com.movies.mapper.MovieMapper;
-import com.movies.security.services.UserDetailsImpl;
+import com.movies.service.UserDetailsImpl;
 import com.movies.service.MoviesService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +46,16 @@ public class MoviesController {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Retrieves a paginated and optionally searchable list of movies.
+     *
+     * @param page    the page number (default: 0)
+     * @param size    the page size (default: 10)
+     * @param sortBy  the field to sort by (default: "id")
+     * @param sortDir the sort direction, either asc or desc (default: "asc")
+     * @param search  an optional search term for filtering by movie name
+     * @return a ResponseEntity containing a map with movie data
+     */
     @GetMapping
     public ResponseEntity<Map<String, Object>> findAll(
             @RequestParam(defaultValue = "0", required = false) Integer page,
@@ -82,6 +91,12 @@ public class MoviesController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Retrieves details of a single movie by its ID.
+     *
+     * @param movieId the ID of the movie
+     * @return a ResponseEntity containing the movie details or a 404 status if not found
+     */
     @GetMapping("/{movieId}")
     public ResponseEntity<MovieResponseDTO> getMovie(@PathVariable Long movieId) {
         Movie movie = moviesService.findById(movieId);
@@ -91,6 +106,13 @@ public class MoviesController {
         return ResponseEntity.ok(MovieMapper.toResponse(movie));
     }
 
+    /**
+     * Creates a new movie with details provided in the request body.
+     *
+     * @param movieDTO    the movie creation object
+     * @param currentUser the authenticated user creating the movie
+     * @return a ResponseEntity containing the created movie details
+     */
     @PostMapping
     public ResponseEntity<MovieResponseDTO> addMovie(
             @Valid @RequestBody MovieCreateDTO movieDTO,
@@ -109,6 +131,14 @@ public class MoviesController {
         return ResponseEntity.ok(MovieMapper.toResponse(saved));
     }
 
+    /**
+     * Updates an existing movie identified by its ID.
+     *
+     * @param movieId     the ID of the movie to update
+     * @param movieDTO    the updated movie details
+     * @param currentUser the authenticated user performing the update
+     * @return a ResponseEntity containing the updated movie details
+     */
     @PutMapping("/{movieId}")
     public ResponseEntity<MovieResponseDTO> updateMovie(
             @PathVariable Long movieId,
@@ -135,7 +165,13 @@ public class MoviesController {
         return ResponseEntity.ok(MovieMapper.toResponse(saved));
     }
 
-
+    /**
+     * Deletes a movie identified by its ID.
+     *
+     * @param movieId     the ID of the movie to delete
+     * @param currentUser the authenticated user performing the deletion
+     * @return a ResponseEntity containing a success message or an error status
+     */
     @DeleteMapping("/{movieId}")
     public ResponseEntity<String> deleteMovie(@PathVariable Long movieId,
                                               @AuthenticationPrincipal UserDetailsImpl currentUser) {
@@ -153,6 +189,12 @@ public class MoviesController {
         return ResponseEntity.ok("Deleted movie id - " + movieId);
     }
 
+    /**
+     * Searches for movies by their name and returns the results.
+     *
+     * @param name the name or part of the name to search for
+     * @return a ResponseEntity containing a list of matching movies
+     */
     @GetMapping("/search")
     public ResponseEntity<List<MovieResponseDTO>> searchMoviesByName(@RequestParam String name) {
         List<Movie> movies = moviesService.findByNameContaining(name, Pageable.unpaged()).getContent();

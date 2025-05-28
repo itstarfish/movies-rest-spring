@@ -9,6 +9,13 @@ import java.time.LocalDateTime;
 
 public class MovieMapper {
 
+    /**
+     * Maps a MovieCreateDTO object and the User who created it to a Movie entity.
+     *
+     * @param dto       the DTO containing movie creation data
+     * @param createdBy the user who created the movie
+     * @return a Movie entity populated with the provided DTO and user information
+     */
     public static Movie toEntity(MovieCreateDTO dto, User createdBy) {
         Movie movie = new Movie();
         movie.setName(dto.getName());
@@ -19,6 +26,12 @@ public class MovieMapper {
         return movie;
     }
 
+    /**
+     * Maps a Movie entity to a MovieResponseDTO object.
+     *
+     * @param entity the Movie entity to be mapped
+     * @return a MovieResponseDTO object containing the entity's data
+     */
     public static MovieResponseDTO toResponse(Movie entity) {
         MovieResponseDTO dto = new MovieResponseDTO();
         dto.setId(entity.getId());
@@ -29,6 +42,7 @@ public class MovieMapper {
         dto.setCreatedBy(entity.getCreatedBy().getId());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
+        dto.setCreatedByName(entity.getCreatedBy().getUsername());
         return dto;
     }
 }

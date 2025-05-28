@@ -7,7 +7,7 @@ import com.movies.entity.Movie;
 import com.movies.entity.Review;
 import com.movies.entity.User;
 import com.movies.mapper.ReviewMapper;
-import com.movies.security.services.UserDetailsImpl;
+import com.movies.service.UserDetailsImpl;
 import com.movies.service.MoviesService;
 import com.movies.service.ReviewService;
 import jakarta.validation.Valid;
@@ -21,21 +21,34 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * ReviewsController handles CRUD operations for movie reviews.
+ */
 @RestController
 @RequestMapping("/api/v1/")
-@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class ReviewsController {
 
     private final ReviewService reviewService;
     private final MoviesService moviesService;
 
+    /**
+     * Constructor to inject required services.
+     *
+     * @param reviewService The review service for CRUD operations on reviews.
+     * @param moviesService The movie service for retrieving movie data.
+     */
     @Autowired
     public ReviewsController(ReviewService reviewService, MoviesService moviesService) {
         this.reviewService = reviewService;
         this.moviesService = moviesService;
     }
 
-    // GET /api/reviews
+    /**
+     * Retrieves all reviews.
+     *
+     * @return A list of ReviewResponseDTO wrapped in a ResponseEntity.
+     */
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')") // Restrict access to users with specific roles
     @GetMapping("/reviews")
     public ResponseEntity<List<ReviewResponseDTO>> getAllReviews() {
         List<Review> reviews = reviewService.findAll();
@@ -45,7 +58,13 @@ public class ReviewsController {
         return ResponseEntity.ok(response);
     }
 
-    // GET /api/movies/{movieId}/reviews
+    /**
+     * Retrieves reviews for a specific movie.
+     *
+     * @param movieId The ID of the movie.
+     * @return A list of ReviewResponseDTO for the specified movie.
+     */
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')") // Restrict access to users with specific roles
     @GetMapping("/movies/{movieId}/reviews")
     public ResponseEntity<List<ReviewResponseDTO>> getReviewsByMovieId(@PathVariable Long movieId) {
         List<Review> reviews = reviewService.findByMovieId(movieId);
@@ -55,7 +74,14 @@ public class ReviewsController {
         return ResponseEntity.ok(response);
     }
 
-    // POST /api/reviews
+    /**
+     * Adds a new review for a movie.
+     *
+     * @param reviewDTO   The DTO containing the review data.
+     * @param currentUser The authenticated current user creating the review.
+     * @return The created ReviewResponseDTO.
+     */
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')") // Restrict access to users with specific roles
     @PostMapping("/reviews")
     public ResponseEntity<ReviewResponseDTO> addReview(@Valid @RequestBody ReviewCreateDTO reviewDTO,
                                                        @AuthenticationPrincipal UserDetailsImpl currentUser) {
@@ -71,7 +97,15 @@ public class ReviewsController {
         return ResponseEntity.ok(ReviewMapper.toResponse(saved));
     }
 
-    // PUT /api/reviews/{reviewId}
+    /**
+     * Updates an existing review.
+     *
+     * @param reviewId    The ID of the review to be updated.
+     * @param reviewDTO   The DTO containing updated review data.
+     * @param currentUser The authenticated current user attempting to update the review.
+     * @return The updated ReviewResponseDTO.
+     */
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')") // Restrict access to users with specific roles
     @PutMapping("/reviews/{reviewId}")
     public ResponseEntity<ReviewResponseDTO> updateReview(@PathVariable Long reviewId,
                                                           @Valid @RequestBody ReviewUpdateDTO reviewDTO,
@@ -91,7 +125,14 @@ public class ReviewsController {
         return ResponseEntity.ok(ReviewMapper.toResponse(saved));
     }
 
-    // DELETE /api/reviews/{reviewId}
+    /**
+     * Deletes a review.
+     *
+     * @param reviewId    The ID of the review to be deleted.
+     * @param currentUser The authenticated current user attempting to delete the review.
+     * @return A message indicating successful deletion.
+     */
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')") // Restrict access to users with specific roles
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<String> deleteReview(@PathVariable Long reviewId,
                                                @AuthenticationPrincipal UserDetailsImpl currentUser) {

@@ -12,6 +12,12 @@ import java.util.List;
 @Configuration
 public class SwaggerConfig {
 
+    /**
+     * Configures and provides the OpenAPI specification for the Movies API.
+     * This includes basic API information and JWT-based security configuration.
+     *
+     * @return an instance of {@link OpenAPI} with configured API details and security settings
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
